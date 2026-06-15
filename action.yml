@@ -10,7 +10,7 @@ inputs:
     required: true
   sender:
     description: 'From address'
-    default: 'peterumas@gmail.com'
+    default: 'elijahuma001@gmail.com'
     required: true
   subject:
     description: 'Email subject'
