@@ -1,0 +1,37 @@
+name: 'Email Security Report'
+description: 'Emails a Trivy container scan report as an attachment'
+
+inputs:
+  report_path:
+    description: 'Path to the report file to attach'
+    required: true
+  recipients:
+    description: 'Comma-separated recipient emails'
+    required: true
+  sender:
+    description: 'From address'
+    default: 'peterumas@gmail.com'
+    required: true
+  subject:
+    description: 'Email subject'
+    required: true
+  smtp_server:
+    description: 'SMTP server hostname'
+    required: true
+  smtp_port:
+    description: 'SMTP port'
+    default: '25'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Send report email
+      shell: bash
+      env:
+        REPORT_PATH: ${{ inputs.report_path }}
+        RECIPIENTS: ${{ inputs.recipients }}
+        SENDER: ${{ inputs.sender }}
+        SUBJECT: ${{ inputs.subject }}
+        SMTP_SERVER: ${{ inputs.smtp_server }}
+        SMTP_PORT: ${{ inputs.smtp_port }}
+      run: python3 ${{ gi
