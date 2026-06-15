@@ -14,7 +14,7 @@ msg.set_content("Attached is the latest container security scan report.")
 msg.add_attachment(report.read_bytes(), maintype="text",
                    subtype="html", filename=report.name)
 
-with smtplib.SMTP(os.environ["SMTP_SERVER"], int(os.environ["SMTP_PORT"])) as s:
+with smtplib.SMTP(env("SMTP_SERVER"), int(env("SMTP_PORT", default="587"))) as s:
     s.starttls()
     s.login(env("SMTP_USERNAME"), env("SMTP_PASSWORD"))
     s.send_message(msg)
