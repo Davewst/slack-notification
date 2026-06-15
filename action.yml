@@ -34,4 +34,4 @@ runs:
         SUBJECT: ${{ inputs.subject }}
         SMTP_SERVER: ${{ inputs.smtp_server }}
         SMTP_PORT: ${{ inputs.smtp_port }}
-      run: python3 ${{ gi
+      run: python3 ${{ github.action_path }}/send_report.py
