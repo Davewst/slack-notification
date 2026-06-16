@@ -1,5 +1,4 @@
-import os, sys, smtplib
-from email.message import EmailMessage
+import os, sys, subprocess
 from pathlib import Path
 
 def env(name, default=None, required=True):
@@ -12,17 +11,27 @@ report = Path(env("REPORT_PATH"))
 if not report.is_file():
     sys.exit(f"ERROR: report not found: {report}")
 
-msg = EmailMessage()
-msg["Subject"] = env("SUBJECT")
-msg["From"]    = env("SENDER")
-msg["To"]      = env("RECIPIENTS")
-msg.set_content("Attached is the latest container security scan report.")
-msg.add_attachment(report.read_bytes(), maintype="text",
-                   subtype="plain", filename=report.name)
+sender     = env("SENDER")
+subject    = env("SUBJECT")
+recipients = env("RECIPIENTS")     # comma-separated
+body       = env("BODY",
+                 default="Please find attached the latest container scan report.",
+                 required=False)
 
-with smtplib.SMTP(env("SMTP_SERVER"), int(env("SMTP_PORT", default="587"))) as s:
-    s.starttls()
-    s.login(env("SMTP_USERNAME"), env("SMTP_PASSWORD"))
-    s.send_message(msg)
+# Split recipients into separate args so we don't rely on the shell to parse them.
+to_list = [r.strip() for r in recipients.split(",") if r.strip()]
+if not to_list:
+    sys.exit("ERROR: no valid recipients")
 
-print(f"Email sent with {report.name} attached")
+# Delivery goes through the HOST's configured mail relay (mailx / MTA): no SMTP
+# server, port, username, or password required. The attach flag is
+# implementation-dependent -- RHEL/heirloom mailx uses -a, GNU mailutils uses -A.
+cmd = ["mail", "-s", subject, "-r", sender, "-a", str(report), *to_list]
+
+try:
+    subprocess.run(cmd, input=body, text=True, check=True)   # no shell=True -> no injection
+    print(f"Email sent: {report.name} -> {', '.join(to_list)}")
+except FileNotFoundError:
+    sys.exit("ERROR: 'mail' not found -- install mailx/mailutils on the runner host")
+except subprocess.CalledProcessError as e:
+    sys.exit(f"ERROR: mail command failed (exit {e.returncode})")
