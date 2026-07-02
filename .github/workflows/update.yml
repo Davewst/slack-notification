@@ -12,8 +12,8 @@ name: Notify consumer repos
 
 on:
   push:
-    branches: [main]
-    paths: ['action.yml', 'send_report.py]
+    branches: [ "main" ]
+    paths: ['action.yml', 'send_report.py']
   workflow_dispatch: {}   # manual re-fire for testing
 
 jobs:
