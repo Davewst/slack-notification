@@ -34,7 +34,7 @@ jobs:
               -H "Authorization: Bearer ${{ secrets.FLEET_DISPATCH_TOKEN }}" \
               -H "Accept: application/vnd.github+json" \
               "${GITHUB_API_URL}/repos/${REPO}/dispatches" \
-              -d '{"event_type":"ccte-docker-build-updated","client_payload":{"action_sha":"${{ github.sha }}"}}'
+              -d '{"event_type":"slack-notification","client_payload":{"action_sha":"${{ github.sha }}"}}'
             then
               echo "  OK"
             else
