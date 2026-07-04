@@ -23,6 +23,7 @@ jobs:
       # The fleet. One repo per line.
       REPOS: |
         Davewst/Docker-build
+        Davewst/web-app
     steps:
       - name: Dispatch builds
         run: |
